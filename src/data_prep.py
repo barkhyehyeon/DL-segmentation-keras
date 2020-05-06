@@ -35,32 +35,19 @@ def resize_data(data, n, row, col, ch):
             ret[i,...,j] = img
     return ret
 
-def shuffle_resize_encode_data(X, Y1, seed, row, col, Y2=None):
+def shuffle_resize_encode_data(X, Y1, seed, row, col):
     Y = []
-    if Y2 is None:
-        for i in range(3):
-            X[i], Y1[i] = shuffle(X[i], Y1[i], random_state=seed)
-            
-            X[i] = resize_data(X[i], len(X[i]), row, col, 3)
-            Y1[i] = resize_data(Y1[i], len(Y1[i]), row, col, 1)
-            
-            encoded = np.ones((len(Y1[i]), row, col, 2), dtype=np.uint8)
-            encoded[...,1] = (Y1[i][...,0] != 0) * 1
-            encoded[...,0] = encoded[...,0] - encoded[...,1]
-            Y.append(encoded)
-    else:
-        for i in range(3):
-            X[i], Y1[i], Y2[i] = shuffle(X[i], Y1[i], Y2[i], random_state=seed)
-            
-            X[i] = resize_data(X[i], len(X[i]), row, col, 3)
-            Y1[i] = resize_data(Y1[i], len(Y1[i]), row, col, 1)
-            Y2[i] = resize_data(Y2[i], len(Y2[i]), row, col, 1)
-            
-            encoded = np.ones((len(Y1[i]), row, col, 3), dtype=np.uint8)
-            encoded[...,1] = (Y1[i][...,0] != 0) * 1
-            encoded[...,2] = (Y2[i][...,0] != 0) * 1
-            encoded[...,0] = encoded[...,0] - (encoded[...,1] + encoded[...,2])
-            Y.append(encoded)
+    for i in range(3):
+        X[i], Y1[i] = shuffle(X[i], Y1[i], random_state=seed)
+        
+        X[i] = resize_data(X[i], len(X[i]), row, col, 3)
+        Y1[i] = resize_data(Y1[i], len(Y1[i]), row, col, 1)
+        
+        encoded = np.ones((len(Y1[i]), row, col, 2), dtype=np.uint8)
+        encoded[...,1] = (Y1[i][...,0] != 0) * 1
+        encoded[...,0] = encoded[...,0] - encoded[...,1]
+        Y.append(encoded)
+    
     return X, Y
 
 def augment_data(X, Y, batch_size, seed, datagen_args=None):
